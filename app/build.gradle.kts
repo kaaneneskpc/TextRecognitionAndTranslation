@@ -70,7 +70,7 @@ dependencies {
 
     //text recognition
     implementation(libs.text.recognition)
-
+    implementation (libs.translate)
 
     //camera
     implementation(libs.androidx.camera.camera2)

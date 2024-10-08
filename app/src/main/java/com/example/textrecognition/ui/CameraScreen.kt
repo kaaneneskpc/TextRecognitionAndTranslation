@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.camera.core.AspectRatio
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -14,11 +15,18 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +40,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 
 @Composable
 fun CameraScreen() {
@@ -44,16 +55,67 @@ private fun CameraContent() {
 
     val context: Context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
-    val cameraController: LifecycleCameraController = remember { LifecycleCameraController(context) }
+    val cameraController: LifecycleCameraController =
+        remember { LifecycleCameraController(context) }
     var detectedText: String by remember { mutableStateOf("No text detected yet..") }
+    var showTranslationDialog by remember { mutableStateOf(false) }
+    var translatedText by remember { mutableStateOf("") }
+    var showTranslatedTextDialog by remember { mutableStateOf(false) }
 
     fun onTextUpdated(updatedText: String) {
         detectedText = updatedText
     }
 
+    LaunchedEffect(Unit) {
+        downloadTranslationModel(context)
+    }
+
+    if (showTranslatedTextDialog) {
+        AlertDialog(
+            onDismissRequest = { showTranslatedTextDialog = false },
+            title = { Text("Translated Text") },
+            text = { Text(translatedText) },
+            confirmButton = {
+                Button(onClick = { showTranslatedTextDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showTranslationDialog) {
+        AlertDialog(
+            onDismissRequest = { showTranslationDialog = false },
+            title = { Text("Translate to Turkish?") },
+            text = { Text("Do you want to translate the detected text to Turkish?") },
+            confirmButton = {
+                Button(onClick = {
+                    showTranslationDialog = false
+                    translateText(detectedText) { result ->
+                        translatedText = result
+                        showTranslatedTextDialog = true
+                    }
+                }) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showTranslationDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBar(title = { Text("Text Scanner") }) },
+        topBar = {
+            TopAppBar(title = { Text("Text Scanner") }, actions = {
+                IconButton(onClick = { showTranslationDialog = true }) {
+                    Icon(Icons.Filled.Translate, contentDescription = "Translate")
+                }
+            })
+        },
     ) { paddingValues: PaddingValues ->
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -97,6 +159,41 @@ private fun CameraContent() {
             )
         }
     }
+}
+
+private fun downloadTranslationModel(context: Context) {
+    val options = TranslatorOptions.Builder()
+        .setSourceLanguage(TranslateLanguage.ENGLISH)
+        .setTargetLanguage(TranslateLanguage.TURKISH)
+        .build()
+    val translator = Translation.getClient(options)
+
+    translator.downloadModelIfNeeded()
+        .addOnSuccessListener {
+            // Model downloaded successfully. You can now translate text.
+            Toast.makeText(context, "Model downloaded successfully", Toast.LENGTH_SHORT).show()
+        }
+        .addOnFailureListener { exception ->
+            // Model download failed. Handle the error appropriately.
+            exception.printStackTrace()
+            Toast.makeText(context, "Model download failed", Toast.LENGTH_SHORT).show()
+        }
+}
+
+private fun translateText(text: String, callback: (String) -> Unit) {
+    val options = TranslatorOptions.Builder()
+        .setSourceLanguage(TranslateLanguage.ENGLISH)
+        .setTargetLanguage(TranslateLanguage.TURKISH)
+        .build()
+    val translator = Translation.getClient(options)
+
+    translator.translate(text)
+        .addOnSuccessListener { translatedText ->
+            callback(translatedText)
+        }
+        .addOnFailureListener { exception ->
+            exception.printStackTrace()
+        }
 }
 
 private fun startTextRecognition(

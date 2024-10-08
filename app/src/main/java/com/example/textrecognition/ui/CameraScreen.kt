@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.camera.core.AspectRatio
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -64,10 +63,6 @@ private fun CameraContent() {
 
     fun onTextUpdated(updatedText: String) {
         detectedText = updatedText
-    }
-
-    LaunchedEffect(Unit) {
-        downloadTranslationModel(context)
     }
 
     if (showTranslatedTextDialog) {
@@ -159,25 +154,6 @@ private fun CameraContent() {
             )
         }
     }
-}
-
-private fun downloadTranslationModel(context: Context) {
-    val options = TranslatorOptions.Builder()
-        .setSourceLanguage(TranslateLanguage.ENGLISH)
-        .setTargetLanguage(TranslateLanguage.TURKISH)
-        .build()
-    val translator = Translation.getClient(options)
-
-    translator.downloadModelIfNeeded()
-        .addOnSuccessListener {
-            // Model downloaded successfully. You can now translate text.
-            Toast.makeText(context, "Model downloaded successfully", Toast.LENGTH_SHORT).show()
-        }
-        .addOnFailureListener { exception ->
-            // Model download failed. Handle the error appropriately.
-            exception.printStackTrace()
-            Toast.makeText(context, "Model download failed", Toast.LENGTH_SHORT).show()
-        }
 }
 
 private fun translateText(text: String, callback: (String) -> Unit) {

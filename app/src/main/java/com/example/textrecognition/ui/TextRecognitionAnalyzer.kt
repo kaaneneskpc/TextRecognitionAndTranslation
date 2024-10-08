@@ -39,9 +39,7 @@ class TextRecognitionAnalyzer(
                 textRecognizer.process(inputImage)
                     .addOnSuccessListener { visionText: Text ->
                         val detectedText: String = visionText.text
-                        if (detectedText.isNotBlank()) {
-                            onDetectedTextUpdated(detectedText)
-                        }
+                        onDetectedTextUpdated(detectedText)
                     }
                     .addOnCompleteListener {
                         continuation.resume(Unit)

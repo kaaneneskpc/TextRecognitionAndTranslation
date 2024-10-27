@@ -79,27 +79,7 @@ private fun CameraContent() {
     }
 
     if (showTranslationDialog) {
-        AlertDialog(
-            onDismissRequest = { showTranslationDialog = false },
-            title = { Text("Translate to Turkish?") },
-            text = { Text("Do you want to translate the detected text to Turkish?") },
-            confirmButton = {
-                Button(onClick = {
-                    showTranslationDialog = false
-                    translateText(detectedText) { result ->
-                        translatedText = result
-                        showTranslatedTextDialog = true
-                    }
-                }) {
-                    Text("Yes")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showTranslationDialog = false }) {
-                    Text("No")
-                }
-            }
-        )
+        //Translate the text to Turkish Create Dialog
     }
 
     Scaffold(
@@ -113,79 +93,21 @@ private fun CameraContent() {
         },
     ) { paddingValues: PaddingValues ->
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
             contentAlignment = androidx.compose.ui.Alignment.BottomCenter
         ) {
-
-            AndroidView(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                factory = { context ->
-                    PreviewView(context).apply {
-                        layoutParams = LinearLayout.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        )
-                        setBackgroundColor(Color.BLACK)
-                        implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                        scaleType = PreviewView.ScaleType.FILL_START
-                    }.also { previewView ->
-                        startTextRecognition(
-                            context = context,
-                            cameraController = cameraController,
-                            lifecycleOwner = lifecycleOwner,
-                            previewView = previewView,
-                            onDetectedTextUpdated = ::onTextUpdated
-                        )
-                    }
-                }
-            )
-
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(androidx.compose.ui.graphics.Color.White)
-                    .padding(16.dp),
-                color = androidx.compose.ui.graphics.Color.Black,
-                text = detectedText,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
+            //Update Screen Views
         }
     }
 }
 
 private fun translateText(text: String, callback: (String) -> Unit) {
-    val options = TranslatorOptions.Builder()
-        .setSourceLanguage(TranslateLanguage.ENGLISH)
-        .setTargetLanguage(TranslateLanguage.TURKISH)
-        .build()
-    val translator = Translation.getClient(options)
-
-    translator.translate(text)
-        .addOnSuccessListener { translatedText ->
-            callback(translatedText)
-        }
-        .addOnFailureListener { exception ->
-            exception.printStackTrace()
-        }
+    //"Translate the text to Turkish"
 }
 
 private fun startTextRecognition(
-    context: Context,
-    cameraController: LifecycleCameraController,
-    lifecycleOwner: LifecycleOwner,
-    previewView: PreviewView,
-    onDetectedTextUpdated: (String) -> Unit
 ) {
-
-    cameraController.imageAnalysisTargetSize = CameraController.OutputSize(AspectRatio.RATIO_16_9)
-    cameraController.setImageAnalysisAnalyzer(
-        ContextCompat.getMainExecutor(context),
-        TextRecognitionAnalyzer(onDetectedTextUpdated = onDetectedTextUpdated)
-    )
-
-    cameraController.bindToLifecycle(lifecycleOwner)
-    previewView.controller = cameraController
+    //"Start text recognition"
 }

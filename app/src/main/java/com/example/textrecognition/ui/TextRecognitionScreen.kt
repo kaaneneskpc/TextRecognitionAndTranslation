@@ -32,22 +32,7 @@ fun TextRecognitionScreen() {
 }
 
 private fun downloadTranslationModel(context: Context) {
-    val options = TranslatorOptions.Builder()
-        .setSourceLanguage(TranslateLanguage.ENGLISH)
-        .setTargetLanguage(TranslateLanguage.TURKISH)
-        .build()
-    val translator = Translation.getClient(options)
-
-    translator.downloadModelIfNeeded()
-        .addOnSuccessListener {
-            // Model downloaded successfully. You can now translate text.
-            Toast.makeText(context, "Model downloaded successfully", Toast.LENGTH_SHORT).show()
-        }
-        .addOnFailureListener { exception ->
-            // Model download failed. Handle the error appropriately.
-            exception.printStackTrace()
-            Toast.makeText(context, "Model download failed", Toast.LENGTH_SHORT).show()
-        }
+    //"Download NLP Model for Translate"
 }
 
 @Composable

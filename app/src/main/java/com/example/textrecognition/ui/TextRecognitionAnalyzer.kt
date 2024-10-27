@@ -22,34 +22,11 @@ class TextRecognitionAnalyzer(
     private val onDetectedTextUpdated: (String) -> Unit
 ) : ImageAnalysis.Analyzer {
 
-    companion object {
-        const val THROTTLE_TIMEOUT_MS = 1_000L
+    //Create a TextRecognitionAnalyzer instance
+
+    override fun analyze(image: ImageProxy) {
+        TODO("Not yet implemented")
     }
 
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val textRecognizer: TextRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-    @OptIn(ExperimentalGetImage::class)
-    override fun analyze(imageProxy: ImageProxy) {
-        scope.launch {
-            val mediaImage: Image = imageProxy.image ?: run { imageProxy.close(); return@launch }
-            val inputImage: InputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-            suspendCoroutine { continuation ->
-                textRecognizer.process(inputImage)
-                    .addOnSuccessListener { visionText: Text ->
-                        val detectedText: String = visionText.text
-                        onDetectedTextUpdated(detectedText)
-                    }
-                    .addOnCompleteListener {
-                        continuation.resume(Unit)
-                    }
-            }
-
-            delay(THROTTLE_TIMEOUT_MS)
-        }.invokeOnCompletion { exception ->
-            exception?.printStackTrace()
-            imageProxy.close()
-        }
-    }
 }

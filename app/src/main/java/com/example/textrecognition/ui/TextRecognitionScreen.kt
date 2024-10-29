@@ -25,14 +25,6 @@ fun TextRecognitionScreen() {
         hasPermission = cameraPermissionState.status.isGranted,
         onRequestPermission = cameraPermissionState::launchPermissionRequest
     )
-
-    LaunchedEffect(Unit) {
-        downloadTranslationModel(context)
-    }
-}
-
-private fun downloadTranslationModel(context: Context) {
-    //"Download NLP Model for Translate"
 }
 
 @Composable

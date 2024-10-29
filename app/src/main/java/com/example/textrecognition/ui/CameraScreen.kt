@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.camera.core.AspectRatio
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -61,6 +62,10 @@ private fun CameraContent() {
     var translatedText by remember { mutableStateOf("") }
     var showTranslatedTextDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        downloadTranslationModel(context)
+    }
+
     fun onTextUpdated(updatedText: String) {
         detectedText = updatedText
     }
@@ -103,8 +108,14 @@ private fun CameraContent() {
     }
 }
 
+//Set Options for the translation
+
 private fun translateText(text: String, callback: (String) -> Unit) {
     //"Translate the text to Turkish"
+}
+
+private fun downloadTranslationModel(context: Context) {
+    //Download the translation model
 }
 
 private fun startTextRecognition(

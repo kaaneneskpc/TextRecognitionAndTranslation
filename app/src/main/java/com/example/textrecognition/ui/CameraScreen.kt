@@ -25,7 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,9 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translation
-import com.google.mlkit.nl.translate.TranslatorOptions
+import com.example.textrecognition.util.TranslationClient
 
 @Composable
 fun CameraScreen() {
@@ -157,13 +154,7 @@ private fun CameraContent() {
 }
 
 private fun translateText(text: String, callback: (String) -> Unit) {
-    val options = TranslatorOptions.Builder()
-        .setSourceLanguage(TranslateLanguage.ENGLISH)
-        .setTargetLanguage(TranslateLanguage.TURKISH)
-        .build()
-    val translator = Translation.getClient(options)
-
-    translator.translate(text)
+    TranslationClient.translator.translate(text)
         .addOnSuccessListener { translatedText ->
             callback(translatedText)
         }

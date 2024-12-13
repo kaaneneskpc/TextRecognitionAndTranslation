@@ -6,13 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.textrecognition.util.TranslationClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translation
-import com.google.mlkit.nl.translate.TranslatorOptions
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -32,13 +30,7 @@ fun TextRecognitionScreen() {
 }
 
 private fun downloadTranslationModel(context: Context) {
-    val options = TranslatorOptions.Builder()
-        .setSourceLanguage(TranslateLanguage.ENGLISH)
-        .setTargetLanguage(TranslateLanguage.TURKISH)
-        .build()
-    val translator = Translation.getClient(options)
-
-    translator.downloadModelIfNeeded()
+    TranslationClient.translator.downloadModelIfNeeded()
         .addOnSuccessListener {
             // Model downloaded successfully. You can now translate text.
             Toast.makeText(context, "Model downloaded successfully", Toast.LENGTH_SHORT).show()
